@@ -25,6 +25,15 @@ Once deployed:
 ## 🔐 Security
 API keys are stored securely using environment variables and are never pushed to GitHub.
 
+## 🚀 How to Run Locally
+
+```bash
+git clone https://github.com/ashu-94/bank-ai-analyzer.git
+cd bank-ai-analyzer
+pip install -r requirements.txt
+uvicorn app:app --reload
+
+
 ---
 
 Built by Ashutosh Kumar 🚀
