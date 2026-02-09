@@ -1,7 +1,23 @@
 README.md
+
 # 🏦 Bank AI Analyzer
 
 Production-ready FastAPI AI system that analyzes bank statements using Azure OpenAI.
+
+## 🏗️ Architecture
+
+User uploads bank statement → FastAPI processes the file →  
+PyPDF extracts text → Azure OpenAI analyzes transactions →  
+Structured insights returned via API.
+
+##Badge
+
+![Python](https://img.shields.io/badge/Python-3.9+-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-Production-green)
+![Azure OpenAI](https://img.shields.io/badge/Azure-OpenAI-purple)
+![Status](https://img.shields.io/badge/Status-Active-success)
+
+
 
 ## 🚀 Features
 - AI-powered transaction analysis
@@ -35,6 +51,7 @@ uvicorn app:app --reload
 
 
 ---
-
 Built by Ashutosh Kumar 🚀
+
+
 
