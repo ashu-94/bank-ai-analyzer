@@ -15,7 +15,7 @@ README.md
 👉 Swagger UI: http://127.0.0.1:8000/docs
 
 
-##  PROJECT DESCRIPTION
+##  DESCRIPTION
 
 An enterprise-grade AI-powered financial analysis system that automatically extracts, categorizes, and generates 
 insights from bank statements using FastAPI and Azure OpenAI.
@@ -43,6 +43,14 @@ Structured insights returned via API.
 - Secure API key management with environment variables
 - FastAPI-based scalable backend
 - Cloud deployment ready
+
+- ## 🧠 AI Capabilities
+
+- Intelligent transaction classification  
+- Spending behavior detection  
+- Financial pattern recognition  
+- Automated insight generation using LLM  
+
 
 ## 🛠 Tech Stack
 - FastAPI
