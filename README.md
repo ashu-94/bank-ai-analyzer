@@ -15,7 +15,8 @@ README.md
 👉 Swagger UI: http://127.0.0.1:8000/docs
 
 
-##  DESCRIPTION
+## 📘 Description
+
 
 An enterprise-grade AI-powered financial analysis system that automatically extracts, categorizes, and generates 
 insights from bank statements using FastAPI and Azure OpenAI.
