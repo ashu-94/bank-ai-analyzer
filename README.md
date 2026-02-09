@@ -2,7 +2,7 @@ README.md
 
 # 🏦 Bank AI Analyzer
 
-##Badges
+## Badges
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Production-green)
@@ -56,9 +56,14 @@ git clone https://github.com/ashu-94/bank-ai-analyzer.git
 cd bank-ai-analyzer
 pip install -r requirements.txt
 uvicorn app:app --reload
-
-
 ---
+
+## 🚀 Live API
+
+Once deployed, access the interactive API docs:
+
+👉 http://127.0.0.1:8000/docs
+
 Built by Ashutosh Kumar 🚀
 
 
