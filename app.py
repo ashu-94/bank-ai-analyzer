@@ -121,8 +121,15 @@ def extract_pdf_text(file_path: str) -> str:
 # ✅ API Endpoint
 # ==========================================
 
-@app.post("/analyze-bank-statement", response_model=BankStatementResponse)
+@app.get("/")
+def health():
+    return {"status": "AI Bank Analyzer Running"}
+
+
+@app.post("/analyze-bank-statement")
 async def analyze_pdf(file: UploadFile = File(...)):
+
+
 
     tmp_path = None
 
