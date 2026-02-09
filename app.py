@@ -6,49 +6,63 @@ from pathlib import Path
 import os
 import tempfile
 import json
+from pydantic import BaseModel
+from typing import List, Optional
 
-# ✅ Load ENV first
+# ==========================================
+# ✅ Load ENV FIRST
+# ==========================================
+
 env_path = Path(__file__).resolve().parent / ".env"
 load_dotenv(dotenv_path=env_path, override=True)
 
-app = FastAPI()
+# ==========================================
+# ✅ FastAPI Metadata (Makes Docs Look Senior)
+# ==========================================
 
-# ✅ MODEL SECTION (KEEP THEM TOGETHER)
+app = FastAPI(
+    title="AI Bank Statement Analyzer",
+    description="Production-ready FastAPI service that extracts structured financial data from bank statements using Azure OpenAI.",
+    version="1.0.0"
+)
 
-from pydantic import BaseModel
-from typing import List
+# ==========================================
+# ✅ Response Models
+# ==========================================
 
 class Address(BaseModel):
-    line1: str | None = None
-    line2: str | None = None
-    city: str | None = None
-    state: str | None = None
-    country: str | None = None
-    postal_code: str | None = None
+    line1: Optional[str] = None
+    line2: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = None
+    postal_code: Optional[str] = None
 
 
 class AccountDetails(BaseModel):
-    account_holder: str | None = None
-    address: Address | None = None
-    account_number: str | None = None
-    account_type: str | None = None
-    currency: str | None = None
+    account_holder: Optional[str] = None
+    address: Optional[Address] = None
+    account_number: Optional[str] = None
+    account_type: Optional[str] = None
+    currency: Optional[str] = None
 
 
 class Transaction(BaseModel):
-    date: str | None = None
-    description: str | None = None
-    debit: float | None = None
-    credit: float | None = None
-    balance: float | None = None
+    date: Optional[str] = None
+    description: Optional[str] = None
+    debit: Optional[float] = None
+    credit: Optional[float] = None
+    balance: Optional[float] = None
 
 
 class BankStatementResponse(BaseModel):
-    account_details: AccountDetails | None = None
-    transactions: List[Transaction] = []   # ⭐ better than None
+    account_details: Optional[AccountDetails] = None
+    transactions: List[Transaction] = []
+    message: str
+
 
 # ==========================================
-# ✅ Validate ENV (FAIL FAST — Production Style)
+# ✅ Validate ENV (Fail Fast — Senior Practice)
 # ==========================================
 
 AZURE_KEY = os.getenv("AZURE_OPENAI_KEY")
@@ -56,25 +70,18 @@ AZURE_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
 API_VERSION = os.getenv("OPENAI_API_VERSION")
 DEPLOYMENT = os.getenv("AZURE_DEPLOYMENT")
 
-print("✅ DEPLOYMENT:", DEPLOYMENT)
-print("✅ VERSION:", API_VERSION)
-print("✅ ENDPOINT:", AZURE_ENDPOINT)
+missing = [k for k, v in {
+    "AZURE_OPENAI_KEY": AZURE_KEY,
+    "AZURE_OPENAI_ENDPOINT": AZURE_ENDPOINT,
+    "OPENAI_API_VERSION": API_VERSION,
+    "AZURE_DEPLOYMENT": DEPLOYMENT
+}.items() if not v]
 
-if not AZURE_KEY:
-    raise ValueError("❌ AZURE_OPENAI_KEY is missing in .env")
-
-if not AZURE_ENDPOINT:
-    raise ValueError("❌ AZURE_OPENAI_ENDPOINT is missing in .env")
-
-if not API_VERSION:
-    raise ValueError("❌ OPENAI_API_VERSION is missing in .env")
-
-if not DEPLOYMENT:
-    raise ValueError("❌ AZURE_DEPLOYMENT is missing in .env")
-
+if missing:
+    raise ValueError(f"Missing environment variables: {missing}")
 
 # ==========================================
-# ✅ Azure Client (Use validated vars — Senior practice)
+# ✅ Azure Client
 # ==========================================
 
 client = AzureOpenAI(
@@ -83,32 +90,32 @@ client = AzureOpenAI(
     api_version=API_VERSION
 )
 
-
 # ==========================================
 # ✅ Utility Function — Extract PDF Text
-# (NO recursion, NO duplication)
 # ==========================================
 
 def extract_pdf_text(file_path: str) -> str:
     try:
         reader = PdfReader(file_path)
 
-        text = []
+        text_pages = [
+            page.extract_text()
+            for page in reader.pages
+            if page.extract_text()
+        ]
 
-        for page in reader.pages:
-            extracted = page.extract_text()
-            if extracted:
-                text.append(extracted)
-
-        final_text = "\n".join(text)
+        final_text = "\n".join(text_pages)
 
         if not final_text.strip():
             raise HTTPException(
                 status_code=400,
-                detail="Could not extract text from PDF."
+                detail="No readable text found in PDF."
             )
 
         return final_text
+
+    except HTTPException:
+        raise
 
     except Exception as e:
         raise HTTPException(
@@ -116,45 +123,83 @@ def extract_pdf_text(file_path: str) -> str:
             detail=f"PDF extraction failed: {str(e)}"
         )
 
-
 # ==========================================
-# ✅ API Endpoint
+# ✅ Root Endpoint (Recruiter Trick)
 # ==========================================
 
 @app.get("/")
+def root():
+    return {
+        "message": "AI Bank Statement Analyzer API is running.",
+        "docs": "/docs",
+        "health": "/health"
+    }
+
+# ==========================================
+# ✅ Health Endpoint
+# ==========================================
+
+@app.get("/health")
 def health():
-    return {"status": "AI Bank Analyzer Running"}
+    return {"status": "ok"}
 
+# ==========================================
+# ✅ MAIN ENDPOINT
+# ==========================================
 
-@app.post("/analyze-bank-statement")
-async def analyze_pdf(file: UploadFile = File(...)):
+@app.post(
+    "/analyze-bank-statement",
+    response_model=BankStatementResponse,
+    summary="Analyze Bank Statement",
+    description="Upload a bank statement PDF and extract structured transaction data using Azure OpenAI."
+)
+async def analyze_bank_statement(file: UploadFile = File(...)):
 
-
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(
+            status_code=400,
+            detail="Only PDF files are supported."
+        )
 
     tmp_path = None
 
     try:
-        # ✅ Save uploaded file temporarily
+        # Save file temporarily
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
             tmp.write(await file.read())
             tmp_path = tmp.name
 
-        # ✅ Extract PDF text
         pdf_text = extract_pdf_text(tmp_path)
 
         prompt = f"""
 Extract structured data from this bank statement.
 
-Return ONLY valid JSON.
+Return ONLY valid JSON matching this schema:
+
+{{
+  "account_details": {{
+    "account_holder": "",
+    "account_number": "",
+    "account_type": "",
+    "currency": ""
+  }},
+  "transactions": [
+    {{
+      "date": "",
+      "description": "",
+      "debit": 0,
+      "credit": 0,
+      "balance": 0
+    }}
+  ]
+}}
 
 Bank Statement:
 {pdf_text}
 """
 
-        # ✅ Azure OpenAI Call
         response = client.chat.completions.create(
-            model=os.getenv("AZURE_DEPLOYMENT")
-,  # MUST match Azure deployment name
+            model=DEPLOYMENT,
             messages=[
                 {
                     "role": "system",
@@ -167,24 +212,26 @@ Bank Statement:
 
         content = response.choices[0].message.content.strip()
 
-        # ✅ Remove markdown safely
+        # Remove markdown if present
         if content.startswith("```"):
             content = content.replace("```json", "").replace("```", "").strip()
 
-        # ✅ Validate JSON
         try:
-            result = json.loads(content)
+            parsed_json = json.loads(content)
         except json.JSONDecodeError:
             raise HTTPException(
                 status_code=500,
-                detail=f"Model returned invalid JSON:\n{content}"
+                detail="Model returned invalid JSON."
             )
 
-        return result
+        return BankStatementResponse(
+            account_details=parsed_json.get("account_details"),
+            transactions=parsed_json.get("transactions", []),
+            message="Bank statement processed successfully."
+        )
 
-
-    except HTTPException as http_err:
-        raise http_err
+    except HTTPException:
+        raise
 
     except Exception as e:
         raise HTTPException(
@@ -193,6 +240,5 @@ Bank Statement:
         )
 
     finally:
-        # ✅ Always cleanup temp file
         if tmp_path and os.path.exists(tmp_path):
             os.remove(tmp_path)
