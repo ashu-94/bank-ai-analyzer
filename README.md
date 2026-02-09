@@ -17,10 +17,10 @@ README.md
 
 ## 📘 Description
 
-
 An enterprise-grade AI-powered financial analysis system that automatically extracts, categorizes, and generates 
 insights from bank statements using FastAPI and Azure OpenAI.
-Built with production-ready architecture, secure API handling, and scalable backend design.
+Designed with production best practices including modular architecture, environment-based secrets management, and scalable API design.
+
 
 
 ## 🏗️ Architecture
