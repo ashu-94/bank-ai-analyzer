@@ -10,6 +10,11 @@ README.md
 ![Status](https://img.shields.io/badge/Status-Active-success)
 ![API](https://img.shields.io/badge/API-Live-success)
 
+## 🎥 Demo
+
+👉 Swagger UI: http://127.0.0.1:8000/docs
+
+
 ##  PROJECT DESCRIPTION
 
 An enterprise-grade AI-powered financial analysis system that automatically extracts, categorizes, and generates 
