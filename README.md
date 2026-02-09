@@ -2,7 +2,7 @@ README.md
 
 # 🏦 Bank AI Analyzer
 
-## Badges
+ ## 🏷️ Badges
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Production-green)
@@ -10,7 +10,12 @@ README.md
 ![Status](https://img.shields.io/badge/Status-Active-success)
 ![API](https://img.shields.io/badge/API-Live-success)
 
-Production-ready FastAPI AI system that analyzes bank statements using Azure OpenAI.
+##  PROJECT DESCRIPTION
+
+An enterprise-grade AI-powered financial analysis system that automatically extracts, categorizes, and generates 
+insights from bank statements using FastAPI and Azure OpenAI.
+Built with production-ready architecture, secure API handling, and scalable backend design.
+
 
 ## 🏗️ Architecture
 
