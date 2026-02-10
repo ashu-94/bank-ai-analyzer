@@ -11,8 +11,10 @@ README.md
 ![API](https://img.shields.io/badge/API-Live-success)
 
 ## 🎥 Demo
-
 👉 Swagger UI: http://127.0.0.1:8000/docs
+
+🚀 Live Demo
+👉 https://bank-ai-analyzer-1.onrender.com/docs
 
 
 ## 📘 Description
@@ -76,13 +78,6 @@ cd bank-ai-analyzer
 pip install -r requirements.txt
 uvicorn app:app --reload
 ---
-
-## 🚀 Live API
-
-Once deployed, access the interactive API docs:
-
-👉 http://127.0.0.1:8000/docs
-
 Built by Ashutosh Kumar 🚀
 
 
